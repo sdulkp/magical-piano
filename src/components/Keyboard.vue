@@ -265,13 +265,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-    // 移动端绑定touch事件
     document.querySelectorAll('.key').forEach(item => {
       item.removeEventListener('touchstart', playNoteByCursor);
       item.removeEventListener('touchend', stopNoteByCursor);
     });
   } else {
-    // PC端绑定mouse事件
     document.querySelectorAll('.key').forEach(item => {
       item.removeEventListener('mousedown', playNoteByCursor);
       item.removeEventListener('mouseup', stopNoteByCursor);

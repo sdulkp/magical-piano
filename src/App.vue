@@ -4,7 +4,7 @@ import PlayerPanel from '@/components/PlayerPanel.vue';
 </script>
 
 <template>
-  <header class="main-title">Fancy Piano</header>
+  <header class="main-title">Magical Piano</header>
   <PlayerPanel />
   <KeyBoard />
 </template>
