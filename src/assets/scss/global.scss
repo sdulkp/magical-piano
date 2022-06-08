@@ -1,0 +1,22 @@
+@use 'sass:math';
+
+@function transferToVW($px) {
+  @return math.div($px, 1536) * 100vw;
+}
+
+@function transferToRem($px) {
+  @return math.div($px, 10) + rem;
+}
+
+@font-face {
+  font-family: 'roboto';
+  src: url('/font/roboto.otf');
+}
+
+@font-face {
+  font-family: 'rozha';
+  src: url('/font/Rozha-one.ttf');
+}
+
+// $globalBackground: #2E2E2E;
+$globalBackground: #2E2E2E;
