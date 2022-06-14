@@ -66,7 +66,10 @@
     </div>
     <div class="panel-right">
       <div class="music-list-wrapper">
-        <div class="music-list-header">音乐列表</div>
+        <div class="music-list-header">
+          <img src="/icon/music.svg" />
+          <span>音乐列表</span>
+        </div>
         <ul class="music-list-body">
           <li>summer - 久石让</li>
           <li>江南 - 林俊杰</li>
@@ -551,6 +554,8 @@ $panelShadowColor: rgba(220, 220, 220, 0.05);
         font-family: Microsoft YaHei, sans-serif;
         font-size: transferToRem(18);
         color: #E6E6E6;
+        display: flex;
+        align-items: center;
       }
 
       .music-list-header::after {
@@ -562,6 +567,12 @@ $panelShadowColor: rgba(220, 220, 220, 0.05);
         height: 1px;
         background: rgba(220, 220, 220, 0.5);
         transform: scale(0.5);
+      }
+
+      .music-list-header > img {
+        margin-right: transferToRem(14);
+        width: transferToRem(20);
+        height: transferToRem(20);
       }
 
       .music-list-body {
