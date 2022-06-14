@@ -39,6 +39,7 @@ const resolveTracksFromMusFile = async (file, tone = 0) => {
   let maxTrackTime = -Infinity;
   for (let i = 1; i < textArr.length; i++) {
     // 延后0.5s播放，避免第一个音符无法播放
+    const trackIndex = i;
     noteDelayTime = 0.5;
     const track = [];
     const noteList = textArr[i].replace(/\(\d+\)/g, '').replace(/\\r|\\n/g, ' ').trim().split(/\s+/);
@@ -53,6 +54,7 @@ const resolveTracksFromMusFile = async (file, tone = 0) => {
           type: noteName.match(/[#|b]/) ? 'black' : 'white',
           delay: noteDelayTime,
           duration: duration,
+          trackIndex,
         });
         noteDelayTime = noteDelayTime + duration;
       } else {
@@ -67,6 +69,7 @@ const resolveTracksFromMusFile = async (file, tone = 0) => {
             type: noteName.match(/[#|b]/) ? 'black' : 'white',
             delay: noteDelayTime,
             duration: duration,
+            trackIndex,
           });
         }
         track.push(t);
@@ -103,6 +106,7 @@ const noteOn = ({
     type, 
     delay, 
     duration, 
+    trackIndex,
     byHand = false,
     infoQueue
   }) => {
@@ -114,7 +118,8 @@ const noteOn = ({
     source.playbackRate.value = 1;
     source.gainNode = ctx.createGain();
     source.gainNode.connect(ctx.destination);
-    source.gainNode.gain.setValueAtTime(1.0, ctx.currentTime);
+    source.gainNode.gain.value = 0;
+    source.gainNode.gain.linearRampToValueAtTime(1.0, delay + duration * 0.2);
     source.connect(source.gainNode);
     source.start(delay);
     !byHand && infoQueue.push({
@@ -123,6 +128,7 @@ const noteOn = ({
       stopTime: delay + duration,
       index,
       type,
+      trackIndex,
     });
     return source;
 }
@@ -166,7 +172,7 @@ const playMusic = (ctx, audioBufferList, trackList, infoQueue) => {
   const stopNotes = () => {
     infoQueue.forEach(item => {
       const { source, stopTime } = item;
-      noteOff(source, stopTime, 0.08);
+      noteOff(source, stopTime, 0.2);
     });
   }
 

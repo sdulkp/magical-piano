@@ -68,7 +68,8 @@
       <div class="music-list-wrapper">
         <div class="music-list-header">音乐列表</div>
         <ul class="music-list-body">
-          <li>summer - 菊次郎的夏天</li>
+          <li>summer - 久石让</li>
+          <li>江南 - 林俊杰</li>
         </ul>
       </div>
     </div>
