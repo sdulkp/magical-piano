@@ -20,7 +20,7 @@ const loadNotesBuffer = async () => {
 
 // 解析文件构建音轨数组
 const resolveTracksFromMusFile = async (file, tone = 0) => {
-  const text = await _readTextFromFile(file);
+  const text = typeof file === 'string' ? file : await _readTextFromFile(file);
   const textArr = text.split('###');
   const header = textArr[0].replace(/\\r|\\n/g, ' ').trim().split(/\s+/);
   // 升降调

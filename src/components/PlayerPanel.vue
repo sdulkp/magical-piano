@@ -11,7 +11,7 @@
               class="music-file"
               type="file"
               ref="fileBtn"
-              @change="openMusicFile"
+              @change="openAndResolveMusicFile"
               />
             <span>打开</span>
           </div>
@@ -65,22 +65,14 @@
       </div>
     </div>
     <div class="panel-right">
-      <div class="music-list-wrapper">
-        <div class="music-list-header">
-          <img src="/icon/music.svg" />
-          <span>音乐列表</span>
-        </div>
-        <ul class="music-list-body">
-          <li>summer - 久石让</li>
-          <li>江南 - 林俊杰</li>
-        </ul>
-      </div>
+      <MusicList @reload="reloadAudio" />
     </div>
   </div>
 </template>
 
 
 <script setup>
+import MusicList from '@/components/MusicList.vue';
 import { loadNotesBuffer, resolveTracksFromMusFile } from '@/bll/playerbll';
 import { playMusic } from '@/bll/playerbll';
 import { _formatSeconds } from '@/util/tools';
@@ -124,19 +116,24 @@ const clickOpenFileBtn = () => {
   fileBtn.value.click();
 };
 
-const openMusicFile = async (e) => {
+const resolveMusicFile = async (fileData, fileName, fileType) => {
+  musicFile = fileData;
+  musicFileName.value = `${fileName}.${fileType}`;
+  const { _trackList, _trackTime } = await resolveTracksFromMusFile(fileData, tone.value);
+  trackList = _trackList;
+  playTotalTime.value = _formatSeconds(_trackTime);
+  playTotalSeconds = _trackTime;
+}
+
+const openAndResolveMusicFile = async (e) => {
   const el = e.target;
   const file = el.files[0];
-  musicFile = file;
-  const fileName = file.name.substring(file.name.lastIndexOf('.') + 1);
-  if (fileName !== 'mus') {
+  const fileName = file.name.substring(0, file.name.lastIndexOf('.'));
+  const fileType = file.name.substring(file.name.lastIndexOf('.') + 1);
+  if (fileType !== 'mus') {
     alert('目前仅支持解析mus格式的文件');
   } else {
-    musicFileName.value = file.name;
-    const { _trackList, _trackTime } = await resolveTracksFromMusFile(file, tone.value);
-    trackList = _trackList;
-    playTotalTime.value = _formatSeconds(_trackTime);
-    playTotalSeconds = _trackTime;
+    resolveMusicFile(file, fileName, fileType);
   }
   el.value = null;
 };
@@ -231,6 +228,13 @@ const stopAudio = async () => {
   store.commit('setCurrentPlayStatus', 'ready');
 }
 
+const reloadAudio = async (fileInfo) => {
+  await stopAudio();
+  const { data, name, type } = fileInfo;
+  await resolveMusicFile(data, name, type);
+  toggleAudio();
+}
+
 // 升降调
 const adjustTone = async (isPositive) => {
   let nowTone = tone.value;
@@ -254,7 +258,6 @@ const adjustTone = async (isPositive) => {
 
 <style lang="scss">
 @import '@/assets/scss/global';
-$panelShadowColor: rgba(220, 220, 220, 0.05);
 
 .player-panel-container {
   padding: 0 1.5%;
@@ -539,63 +542,6 @@ $panelShadowColor: rgba(220, 220, 220, 0.05);
     flex-basis: 40%;
     flex-grow: 0;
     flex-shrink: 0;
-
-    .music-list-wrapper {
-      height: 100%;
-      border-radius: transferToRem(6);
-      background: $panelShadowColor;
-
-      .music-list-header {
-        position: relative;
-        padding: transferToRem(16);
-        height: transferToRem(50);
-        line-height: transferToRem(18);
-        box-sizing: border-box;
-        font-family: Microsoft YaHei, sans-serif;
-        font-size: transferToRem(18);
-        color: #E6E6E6;
-        display: flex;
-        align-items: center;
-      }
-
-      .music-list-header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: -50%;
-        width: 200%;
-        height: 1px;
-        background: rgba(220, 220, 220, 0.5);
-        transform: scale(0.5);
-      }
-
-      .music-list-header > img {
-        margin-right: transferToRem(14);
-        width: transferToRem(20);
-        height: transferToRem(20);
-      }
-
-      .music-list-body {
-        margin: 0;
-        padding: transferToRem(6) transferToRem(16);
-        height: calc(100% - transferToRem(50));
-        box-sizing: border-box;
-        list-style: none;
-        overflow-x: hidden;
-        overflow-y: auto;
-      }
-
-      .music-list-body > li {
-        margin: transferToRem(6) 0;
-        font-size: transferToRem(13);
-        color: #E6E6E6;
-        cursor: pointer;
-      }
-
-      .music-list-body > li:hover {
-        color: #2E9AFE;
-      }
-    }
   }
 }
 </style>
