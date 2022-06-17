@@ -10,7 +10,7 @@
         :key="music.id"
         @click="loadMusicFile(music)"
         >
-        {{ music.name }}-{{ music.author}}
+        {{ music.name }} - {{ music.author}}
       </li>
     </ul>
   </div>
