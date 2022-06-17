@@ -187,7 +187,7 @@ const setBoardStatus = (isSuspend) => {
 }
 
 // 播放/暂停音频
-const toggleAudio = () => {
+const toggleAudio = async () => {
   if (!trackList) {
     return alert('没有可播放的音源');
   }
@@ -197,17 +197,17 @@ const toggleAudio = () => {
   }
   const { _play, _pause } = playMusic(ctx, audioBufferList, trackList, infoQueue);
   if (currentPlayStatus.value === 'ready') {
-    _play();
+    await _play();
     setBoardStatus();
     calPlayProgress(false);
     store.commit('setCurrentPlayStatus', 'start');
   } else if (currentPlayStatus.value === 'start') {
-    _pause();
+    await _pause();
     setBoardStatus(true);
     calPlayProgress(true);
     store.commit('setCurrentPlayStatus', 'suspend');
   } else if (currentPlayStatus.value === 'suspend') {
-    _play();
+    await _play();
     setBoardStatus();
     calPlayProgress(false);
     store.commit('setCurrentPlayStatus', 'start');
@@ -239,9 +239,17 @@ const reloadAudio = async (fileInfo) => {
 const adjustTone = async (isPositive) => {
   let nowTone = tone.value;
   if (isPositive) {
-    nowTone < 12 && (nowTone += 1);
+    if (nowTone < 12) {
+      nowTone += 1;
+    } else {
+      return;
+    }
   } else {
-    nowTone > -12 && (nowTone -= 1);
+    if (nowTone > -12) {
+      nowTone -= 1;
+    } else {
+      return;
+    }
   }
   tone.value = nowTone;
   const { _trackList } = await resolveTracksFromMusFile(musicFile, nowTone);
@@ -249,9 +257,8 @@ const adjustTone = async (isPositive) => {
   if (currentPlayStatus.value !== 'start') {
     return;
   }
-  const { _play, _pause } = playMusic(ctx, audioBufferList, trackList, infoQueue);
-  await _pause();
-  _play();
+  await toggleAudio();
+  toggleAudio();
 }
 </script>
 
